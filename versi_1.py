@@ -15,7 +15,7 @@ start_frame = cv2.cvtColor(start_frame, cv2.COLOR_BGR2GRAY)
 start_frame = cv2.GaussianBlur(start_frame, (21, 21), 0)
 
 alarm = False
-alarm_mode = False
+alarm_mode = True  # Set alarm_mode to True initially for automatic activation
 alarm_counter = 0
 
 def beep_alarm():
@@ -30,6 +30,7 @@ def beep_alarm():
 while True:
     _, frame = cap.read()
     frame = imutils.resize(frame, width=500)
+    original_frame = frame.copy()  # Copy original frame for display
 
     if alarm_mode:
         frame_bw = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -47,9 +48,11 @@ while True:
             if alarm_counter > 0:
                 alarm_counter -= 1
 
-        cv2.imshow("Cam", threshold)
+        cv2.imshow("Alarm", threshold)
     else:
-        cv2.imshow("Cam", frame)
+        cv2.imshow("Alarm", frame)  # Show original frame if alarm is not active
+
+    cv2.imshow("Original", original_frame)  # Show original frame
 
     if alarm_counter > 10:  # Adjust this value according to your requirement
         if not alarm: 
@@ -57,9 +60,6 @@ while True:
             threading.Thread(target=beep_alarm).start()
 
     key_pressed = cv2.waitKey(30)
-    if key_pressed == ord("t"):
-        alarm_mode = not alarm_mode
-        alarm_counter = 0
     if key_pressed == ord("q"):
         alarm_mode = False
         break
